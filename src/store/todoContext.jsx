@@ -6,17 +6,17 @@ import {
   Suspense,
 } from "react";
 
-const ACTIONS = {
+export const ACTIONS = {
   NEW_TODO: "newTodo",
   TOGGLE_TODO: "toggleTodo",
   DELETE_TODO: "deleteTodo",
   EDIT_TODO: "editTodo",
+  REORDER_TODOS: "reorderTodos",
 };
 
 export const TodoContext = createContext({
   todos: [],
   dispatch: () => {},
-  ACTIONS: {},
 });
 
 function todoReducer(todos, action) {
@@ -44,12 +44,14 @@ function todoReducer(todos, action) {
         todo.id === action.payload.id
           ? {
               ...todo,
-              name: action.payload.name,
-              priority: action.payload.priority,
-              dueDate: action.payload.dueDate,
+              name: action.payload.name || todo.name,
+              priority: action.payload.priority || todo.priority,
+              dueDate: action.payload.dueDate || todo.dueDate,
             }
           : todo
       );
+    case ACTIONS.REORDER_TODOS:
+      return action.payload;
     default:
       return todos;
   }
