@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTodoContext } from "../store/todoContext.jsx";
 
 export function useFilteredTodos() {
   const { todos } = useTodoContext();
   const [filter, setFilter] = useState("all");
-  const [filteredTodos, setFilteredTodos] = useState([]);
 
-  useEffect(() => {
+  // Get filtered and sorted todos
+  const getFilteredTodos = () => {
     const priorityMap = {
       high: 1,
       medium: 2,
@@ -19,15 +19,16 @@ export function useFilteredTodos() {
 
     switch (filter) {
       case "completed":
-        setFilteredTodos(sortedTodos.filter((todo) => todo.completed));
-        break;
+        return sortedTodos.filter((todo) => todo.completed);
       case "active":
-        setFilteredTodos(sortedTodos.filter((todo) => !todo.completed));
-        break;
+        return sortedTodos.filter((todo) => !todo.completed);
       default:
-        setFilteredTodos(sortedTodos);
+        return sortedTodos;
     }
-  }, [todos, filter]);
+  };
+
+  // Memoize the filtered todos to avoid unnecessary re-renders
+  const filteredTodos = useMemo(() => getFilteredTodos(), [todos, filter]);
 
   return { filteredTodos, setFilter };
 }
